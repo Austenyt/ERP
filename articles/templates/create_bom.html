@@ -1,0 +1,226 @@
+{% extends 'base.html' %}
+
+{% block title %}Создание спецификации{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1 class="mb-4">Создание спецификации</h1>
+        
+        {% if error %}
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <strong>Ошибка:</strong> {{ error }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endif %}
+        
+        <form method="post" id="bom-form">
+            {% csrf_token %}
+            
+            <!-- Основные данные -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Основные данные</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="article" class="form-label">Артикул *</label>
+                                <input type="number" 
+                                       class="form-control" 
+                                       id="article" 
+                                       name="article" 
+                                       value="{{ form_data.article }}" 
+                                       required>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="name" class="form-label">Наименование *</label>
+                                <input type="text" 
+                                       class="form-control" 
+                                       id="name" 
+                                       name="name" 
+                                       value="{{ form_data.name }}" 
+                                       required>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label class="form-label">Единица измерения</label>
+                                <input type="text"
+                                       class="form-control"
+                                       value="шт"
+                                       disabled
+                                       style="background-color: #e9ecef;">
+                                <input type="hidden" name="unit" value="{{ unit_st_id }}">
+                                <div class="form-text">Единица измерения всегда "шт"</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Материалы -->
+            <div class="card mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">Материалы</h5>
+                    <button type="button" class="btn btn-success btn-sm" onclick="addMaterialRow()">
+                        + Добавить материал
+                    </button>
+                </div>
+                <div class="card-body">
+                    <div id="materials-container">
+                        <!-- Строки материалов будут добавляться здесь -->
+                    </div>
+                    <div class="text-muted small mt-2">
+                        * Обязательные поля
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Вложенные спецификации -->
+            <div class="card mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">Вложенные спецификации</h5>
+                    <button type="button" class="btn btn-success btn-sm" onclick="addBomRow()">
+                        + Добавить спецификацию
+                    </button>
+                </div>
+                <div class="card-body">
+                    <div id="boms-container">
+                        <!-- Строки спецификаций будут добавляться здесь -->
+                    </div>
+                    <div class="text-muted small mt-2">
+                        * Обязательные поля
+                    </div>
+                </div>
+            </div>
+            
+            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                <a href="{% url 'boms' %}" class="btn btn-secondary me-md-2">Отмена</a>
+                <button type="submit" class="btn btn-primary">Создать спецификацию</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    let materialCounter = 0;
+    let bomCounter = 0;
+
+    // Шаблон для строки материала
+    const materialRowTemplate = (index) => `
+        <div class="row mb-3 align-items-center material-row" id="material-row-${index}">
+            <div class="col-md-6">
+                <select class="form-select" name="materials[${index}][material_id]" required>
+                    <option value="">Выберите материал *</option>
+                    {% for material in materials %}
+                        <option value="{{ material.id }}">{{ material.article }} - {{ material.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-4">
+                <input type="number" 
+                       class="form-control" 
+                       name="materials[${index}][quantity]" 
+                       step="0.001" 
+                       min="0.001"
+                       placeholder="Количество *" 
+                       required>
+            </div>
+            <div class="col-md-2">
+                <button type="button" class="btn btn-danger btn-sm w-100" onclick="removeRow('material-row-${index}')">
+                    × Удалить
+                </button>
+            </div>
+        </div>
+    `;
+
+    // Шаблон для строки спецификации
+    const bomRowTemplate = (index) => `
+        <div class="row mb-3 align-items-center bom-row" id="bom-row-${index}">
+            <div class="col-md-6">
+                <select class="form-select" name="boms[${index}][bom_id]" required>
+                    <option value="">Выберите спецификацию *</option>
+                    {% for bom in boms %}
+                        <option value="{{ bom.id }}">{{ bom.article }} - {{ bom.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-4">
+                <input type="number" 
+                       class="form-control" 
+                       name="boms[${index}][quantity]" 
+                       step="0.001" 
+                       min="0.001"
+                       placeholder="Количество *" 
+                       required>
+            </div>
+            <div class="col-md-2">
+                <button type="button" class="btn btn-danger btn-sm w-100" onclick="removeRow('bom-row-${index}')">
+                    × Удалить
+                </button>
+            </div>
+        </div>
+    `;
+
+    // Функции для работы с формой
+    function addMaterialRow() {
+        const container = document.getElementById('materials-container');
+        container.insertAdjacentHTML('beforeend', materialRowTemplate(materialCounter));
+        materialCounter++;
+    }
+
+    function addBomRow() {
+        const container = document.getElementById('boms-container');
+        container.insertAdjacentHTML('beforeend', bomRowTemplate(bomCounter));
+        bomCounter++;
+    }
+
+    function removeRow(rowId) {
+        const row = document.getElementById(rowId);
+        if (row) {
+            row.remove();
+        }
+    }
+
+    // Валидация формы
+    document.getElementById('bom-form').addEventListener('submit', function(e) {
+        const materialRows = document.querySelectorAll('.material-row');
+        const bomRows = document.querySelectorAll('.bom-row');
+        
+        // Проверяем, что есть хотя бы один компонент
+        if (materialRows.length === 0 && bomRows.length === 0) {
+            e.preventDefault();
+            alert('Добавьте хотя бы один материал или вложенную спецификацию');
+            return false;
+        }
+        
+        // Проверяем, что все обязательные поля заполнены
+        let isValid = true;
+        const requiredFields = this.querySelectorAll('[required]');
+        
+        requiredFields.forEach(field => {
+            if (!field.value) {
+                isValid = false;
+                field.classList.add('is-invalid');
+            } else {
+                field.classList.remove('is-invalid');
+            }
+        });
+        
+        if (!isValid) {
+            e.preventDefault();
+            alert('Заполните все обязательные поля (отмечены *)');
+        }
+    });
+
+    // Инициализация - добавляем по одной пустой строке
+    document.addEventListener('DOMContentLoaded', function() {
+        addMaterialRow();
+        addBomRow();
+    });
+</script>
+{% endblock %}

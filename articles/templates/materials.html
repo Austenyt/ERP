@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% block title %}Номенклатура{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="text-center mb-4">Номенклатура</h1>
+    <a href="{% url 'index' %}" class="btn btn-secondary mb-3">← Назад на главную</a>
+    <a href="{% url 'create_material' %}" class="btn btn-secondary mb-3">Создать материал</a>
+    <table class="table table-striped table-hover">
+        <thead class="table-light">
+        <tr>
+            <th>Артикул</th>
+            <th>Название</th>
+            <th>Единица измерения</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% if materials %}
+        {% for material in materials %}
+        <tr>
+            <td><a href="{% url 'detail_material' material.pk %}">{{ material.article }}</a></td>
+            <td>{{ material.name }}</td>
+            <td>{{ material.unit }}</td>
+        </tr>
+        {% endfor %}
+        {% endif %}
+        {% if boms %}
+        {% for bom in boms %}
+        <tr>
+            <td><a href="{% url 'detail_bom' bom.id %}">{{ bom.article }}</a></td>
+            <td>{{ bom.name }}</td>
+            <td>{{ bom.unit }}</td>
+        </tr>
+        {% endfor %}
+        {% endif %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

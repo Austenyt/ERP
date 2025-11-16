@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block title %}Какое-то название{% endblock %}
+
+{% block content %}
+
+{% for warehouse in warehouses %}
+<div>
+    <h4>{{ warehouse.code }} {{ warehouse.name }}</h4>
+    <p>Кол-во артикулов материалов: {{ warehouse.count_materials }}</p>
+    <ul>
+        {% for materials in warehouse.materials %}
+        <li>
+            <p>{{materials.article}} {{materials.name}}</p>
+        </li>
+        {% endfor %}
+    </ul>
+    <p>Кол-во спец: {{ warehouse.count_boms }}</p>
+    <ul>
+        {% for BOM in warehouse.BOMs %}
+        <li>
+            {% include '_BOM_block.html' with BOM=BOM %}
+        </li>
+        {% endfor %}
+    </ul>
+</div>
+{% endfor %}
+
+
+{% endblock %}

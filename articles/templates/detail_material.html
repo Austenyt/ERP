@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% block title %}{{ material.name }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="text-center mb-4">Просмотр материала</h1>
+    <div class="d-flex align-items-center gap-2 mb-3">
+        <a href="{% url 'materials' %}" class="btn btn-secondary">← Назад к списку материалов</a>
+        <a href="{% url 'delete_material' material.pk %}" class="btn btn-danger">Удалить материал</a>
+    </div>
+    <table class="table table-striped table-bordered">
+        <thead class="table-light">
+        <tr>
+            <th scope="col">Артикул</th>
+            <th scope="col">Название</th>
+            <th scope="col">Единица измерения</th>
+            <th scope="col">Цена</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>{{ material.article }}</td>
+            <td>{{ material.name }}</td>
+            <td>{{ material.unit }}</td>
+            <td>{{ material.price }}</td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+{% endblock %}

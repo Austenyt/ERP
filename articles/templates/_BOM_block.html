@@ -1,0 +1,25 @@
+<p>{{BOM.article}} {{BOM.name}}</p>
+<p>Работы:</p>
+<ul>
+    {% for work in BOM.works %}
+    <li>
+        <p>{{ work.code }} {{ work.name }}</p>
+    </li>
+    {% endfor %}
+</ul>
+<p>Материалы:</p>
+<ul>
+    {% for material in BOM.materials %}
+    <li>
+        <p>{{ material.article }} {{ material.name }}</p>
+    </li>
+    {% endfor %}
+</ul>
+<p>Спецификации:</p>
+<ul>
+    {% for child in BOM.boms.all %}
+    <li>
+        {% include '_BOM_block.html' with BOM=child %}
+    </li>
+    {% endfor %}
+</ul>

@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block title %}Создание контрагента{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="text-center mb-4">Создание контрагента</h1>
+    <a href="{% url 'contractors' %}" class="btn btn-secondary mb-3">← Назад к списку контрагентов</a>
+    <div class="card">
+        <div class="card-body">
+            <form method="post">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label for="Code" class="form-label">Код</label>
+                    <input type="text" id="Code" name="code" class="form-control" disabled placeholder="{{ code }}">
+                </div>
+                <div class="mb-3">
+                    <label for="Name" class="form-label">Название</label>
+                    <input type="text" id="Name" name="name" class="form-control" required
+                           placeholder="Введите название">
+                </div>
+                <button type="submit" class="btn btn-primary">Создать</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

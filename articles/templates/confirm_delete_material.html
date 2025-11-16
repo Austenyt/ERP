@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block title %}Подтверждение удаления материала{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="text-center mb-4">Подтверждение удаления материала</h1>
+    <div class="alert alert-warning">
+        <strong>Внимание!</strong> Удаление материала необратимо. Все связанные данные (например, в BOM'ах) могут быть затронуты.
+    </div>
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">Вы действительно хотите удалить этот материал?</h5>
+            <p><strong>Артикул:</strong> {{ material.article }}</p>
+            <p><strong>Название:</strong> {{ material.name }}</p>
+            <form method="post" class="d-inline">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger">Удалить</button>
+            </form>
+            <a href="{% url 'detail_material' material.pk %}" class="btn btn-secondary">Отменить</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

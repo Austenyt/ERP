@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% block title %}Создание работы{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="text-center mb-4">Создание работы</h1>
+    <a href="{% url 'works' %}" class="btn btn-secondary mb-3">← Назад к списку работ</a>
+    <div class="card">
+        <div class="card-body">
+            <form method="post">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label for="Code" class="form-label">Код</label>
+                    <input type="text" id="Code" name="сode" class="form-control" required placeholder="Введите код">
+                </div>
+                <div class="mb-3">
+                    <label for="Name" class="form-label">Название</label>
+                    <input type="text" id="Name" name="name" class="form-control" required
+                           placeholder="Введите название">
+                </div>
+                <div class="mb-3">
+                    <label for="Price" class="form-label">Цена</label>
+                    <input type="number" id="Price" name="price" class="form-control" step="0.01" min="0" required
+                           placeholder="Введите цену">
+                </div>
+                <button type="submit" class="btn btn-primary">Создать</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

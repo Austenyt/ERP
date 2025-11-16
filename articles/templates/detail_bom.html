@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% block title %}Детали спецификации: {{ bom.name }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="text-center mb-4">Просмотр спецификации</h1>
+    <a href="{% url 'boms' %}" class="btn btn-secondary mb-3">← Назад к списку спецификаций</a>
+    <p class="fs-3 text-center mb-4">{{ bom.article }} {{ bom.name }}</p>
+
+    <h5 class="mb-3">Материалы в спецификации</h5>
+    <table class="table table-striped table-hover">
+        <thead class="table-light">
+        <tr>
+            <th scope="col">Артикул</th>
+            <th scope="col">Название</th>
+            <th scope="col">Количество</th>
+            <th scope="col">Единица измерения</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% if materials %}
+        {% for item in materials %}
+        <tr>
+            <td>{{ item.material.article }}</td>
+            <td>{{ item.material.name }}</td>
+            <td>{{ item.quantity|floatformat:2 }}</td>
+            <td>{{ item.material.unit }}</td>
+        </tr>
+        {% endfor %}
+        {% endif %}
+        {% if bom.boms.all %}
+        {% for item in bom.childok.all %}
+        <tr>
+            <td><a href="{% url 'detail_bom' item.id %}">{{ item.child.article }}</a></td>
+            <td>{{ item.child.name }}</td>
+            <td>{{ item.quantity|floatformat:2 }}</td>
+            <td>{{ item.child.unit }}</td>
+        </tr>
+        {% endfor %}
+        {% endif %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

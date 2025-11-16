@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% block title %}{{ contractor.name }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="text-center mb-4">Просмотр контрагента</h1>
+    <div class="d-flex align-items-center gap-2 mb-3">
+        <a href="{% url 'contractors' %}" class="btn btn-secondary">← Назад к списку контрагентов</a>
+    </div>
+    <table class="table table-striped table-bordered">
+        <thead class="table-light">
+        <tr>
+            <th scope="col">Код</th>
+            <th scope="col">Название</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>{{ contractor.code }}</td>
+            <td>{{ contractor.name }}</td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+{% endblock %}

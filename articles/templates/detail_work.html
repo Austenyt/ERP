@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% block title %}{{ work.name }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="text-center mb-4">Просмотр работы</h1>
+    <div class="d-flex align-items-center gap-2 mb-3">
+        <a href="{% url 'works' %}" class="btn btn-secondary">← Назад к списку работ</a>
+    </div>
+    <table class="table table-striped table-bordered">
+        <thead class="table-light">
+        <tr>
+            <th scope="col">Код</th>
+            <th scope="col">Название</th>
+            <th scope="col">Цена</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>{{ work.code }}</td>
+            <td>{{ work.name }}</td>
+            <td>{{ work.price }}</td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+{% endblock %}
