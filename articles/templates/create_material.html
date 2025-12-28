@@ -11,11 +11,22 @@
                 {% csrf_token %}
                 <div class="mb-3">
                     <label for="Article" class="form-label">Артикул</label>
-                    <input type="text" id="Article" name="article" class="form-control" disabled placeholder="{{ article }}">
+                    <input type="text" id="Article" name="article" class="form-control" disabled
+                           placeholder="{{ article }}">
                 </div>
                 <div class="mb-3">
                     <label for="Name" class="form-label">Название</label>
-                    <input type="text" id="Name" name="name" class="form-control" required placeholder="Введите название">
+                    <input type="text" id="Name" name="name" class="form-control" required
+                           placeholder="Введите название">
+                </div>
+                <div class="mb-3">
+                    <label for="Supplier" class="form-label">Поставщик *</label>
+                    <select id="Supplier" name="supplier" class="form-select" required>
+                        <option value="">Выберите поставщика</option>
+                        {% for supplier in suppliers %}
+                        <option value="{{ supplier.id }}">{{ supplier.code }} - {{ supplier.name }}</option>
+                        {% endfor %}
+                    </select>
                 </div>
                 <div class="mb-3">
                     <label for="Unit" class="form-label">Единица измерения</label>
@@ -27,7 +38,8 @@
                 </div>
                 <div class="mb-3">
                     <label for="Price" class="form-label">Цена</label>
-                    <input type="number" id="Price" name="price" class="form-control" step="0.01" min="0" required placeholder="Введите цену">
+                    <input type="number" id="Price" name="price" class="form-control" step="0.01" min="0" required
+                           placeholder="Введите цену">
                 </div>
                 <button type="submit" class="btn btn-primary">Создать</button>
             </form>

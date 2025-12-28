@@ -1,0 +1,117 @@
+{% extends 'base.html' %}
+{% block title %}Перемещения{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Перемещения</h1>
+        <div>
+            <a href="{% url 'create_supply' %}" class="btn btn-success">📥 Создать поставку</a>
+            <a href="{% url 'create_shipping' %}" class="btn btn-primary">📤 Создать отгрузку</a>
+        </div>
+    </div>
+
+    <a href="{% url 'index' %}" class="btn btn-secondary mb-3">← Назад на главную</a>
+
+    <!-- Поиск -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="get">
+                <div class="row g-3 align-items-center">
+                    <div class="col-auto">
+                        <label for="search" class="col-form-label">Поиск:</label>
+                    </div>
+                    <div class="col-md-6">
+                        <input type="text"
+                               id="search"
+                               name="search"
+                               class="form-control"
+                               placeholder="Введите код, контрагента или склад..."
+                               value="{{ search_query }}">
+                    </div>
+                    <div class="col-auto">
+                        <button type="submit" class="btn btn-outline-primary">Найти</button>
+                        {% if search_query %}
+                        <a href="{% url 'movements_list' %}" class="btn btn-outline-secondary">Сбросить</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Результаты поиска -->
+    {% if search_query %}
+    <div class="alert alert-info mb-3">
+        Результаты поиска для: "<strong>{{ search_query }}</strong>"
+        {% if not supplies and not shippings %}
+        - ничего не найдено
+        {% endif %}
+    </div>
+    {% endif %}
+
+    <!-- Общая таблица перемещений -->
+    <table class="table table-striped table-hover">
+        <thead class="table-light">
+        <tr>
+            <th>Код</th>
+            <th>Тип</th>
+            <th>Контрагент</th>
+            <th>Склад</th>
+            <th>Дата</th>
+            <th>Действия</th>
+        </tr>
+        </thead>
+        <tbody>
+        <!-- Поставки -->
+        {% for supply in supplies %}
+        <tr>
+            <td>{{ supply.code }}</td>
+            <td>
+                <span class="badge bg-success">📥 Поставка</span>
+            </td>
+            <td>{{ supply.supplier.name }}</td>
+            <td>{{ supply.warehouse.name }}</td>
+            <td>{{ supply.created_at|date:"d.m.Y H:i" }}</td>
+            <td>
+                <a href="{% url 'supply_detail' supply.id %}" class="btn btn-sm btn-outline-primary">
+                    Просмотр
+                </a>
+            </td>
+        </tr>
+        {% endfor %}
+
+        <!-- Отгрузки -->
+        {% for shipping in shippings %}
+        <tr>
+            <td>{{ shipping.code }}</td>
+            <td>
+                <span class="badge bg-primary">📤 Отгрузка</span>
+            </td>
+            <td>{{ shipping.client.name }}</td>
+            <td>{{ shipping.warehouse.name }}</td>
+            <td>{{ shipping.created_at|date:"d.m.Y H:i" }}</td>
+            <td>
+                <a href="{% url 'shipping_detail' shipping.id %}" class="btn btn-sm btn-outline-primary">
+                    Просмотр
+                </a>
+            </td>
+        </tr>
+        {% endfor %}
+
+        <!-- Сообщение при пустой базе -->
+        {% if not supplies and not shippings %}
+        <tr>
+            <td colspan="6" class="text-center text-muted">
+                {% if search_query %}
+                    Перемещения не найдены
+                {% else %}
+                    Перемещения отсутствуют
+                {% endif %}
+            </td>
+        </tr>
+        {% endif %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

@@ -1,5 +1,8 @@
 from django.contrib.auth.decorators import login_required
+from django.db.models import Q
 from django.shortcuts import render, get_object_or_404, redirect
+
+from contractors.models import Contractor
 from .models import *
 
 
@@ -14,14 +17,36 @@ def index(request):
 
 
 def list_materials(request):
+    search_query = request.GET.get('search', '')
+
     materials = Material.objects.all()
     boms = BOM.objects.all()
-    return render(request, 'materials.html', {'materials': materials, 'boms': boms})
+
+    if search_query:
+        materials = materials.filter(
+            Q(article__icontains=search_query) |
+            Q(name__icontains=search_query)
+        )
+        boms = boms.filter(
+            Q(article__icontains=search_query) |
+            Q(name__icontains=search_query)
+        )
+    return render(request, 'materials.html', {
+        'materials': materials,
+        'boms': boms,
+        'search_query': search_query
+    })
 
 
 def list_boms(request):
+    search_query = request.GET.get('search', '')
     boms = BOM.objects.all()
-    return render(request, 'boms.html', {'boms': boms})
+    if search_query:
+        boms = boms.filter(
+            Q(article__icontains=search_query) |
+            Q(name__icontains=search_query)
+        )
+    return render(request, 'boms.html', {'boms': boms, 'search_query': search_query})
 
 
 def list_warehouses(request):
@@ -77,17 +102,24 @@ def create_material(request):
         name = request.POST.get('name')
         unit = request.POST.get('unit')
         price = request.POST.get('price')
+        supplier_id = request.POST.get('supplier')
 
         material = Material.objects.create(
             article=article,
             name=name,
             unit_id=unit,
             price=price,
+            supplier=supplier_id,
         )
         return redirect('materials')
 
     units = Unit.objects.all()
-    return render(request, 'create_material.html', {'units': units, 'article': article})
+    suppliers = Contractor.objects.all()
+    return render(request, 'create_material.html', {
+        'units': units,
+        'article': article,
+        'suppliers': suppliers
+    })
 
 
 def delete_material(request, pk):
@@ -242,3 +274,28 @@ def create_work(request):
         return redirect('works')
     return render(request, 'create_work.html')
 
+
+def list_movements(request):
+    search_query = request.GET.get('search', '')
+
+    supplies = Supply.objects.all().select_related('supplier', 'warehouse')
+    shippings = Shipping.objects.all().select_related('client', 'warehouse')
+
+    if search_query:
+        supplies = supplies.filter(
+            Q(code__icontains=search_query) |
+            Q(supplier__name__icontains=search_query) |
+            Q(warehouse__name__icontains=search_query)
+        )
+
+        shippings = shippings.filter(
+            Q(code__icontains=search_query) |
+            Q(client__name__icontains=search_query) |
+            Q(warehouse__name__icontains=search_query)
+        )
+
+    return render(request, 'movements.html', {
+        'supplies': supplies,
+        'shippings': shippings,
+        'search_query': search_query
+    })

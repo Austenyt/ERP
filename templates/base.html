@@ -37,10 +37,11 @@
         <div class="list-group list-group-flush">
             <a href="{% url 'materials' %}" class="btn btn-primary btn-lg list-group-item">Номенклатура</a>
             <a href="{% url 'boms' %}" class="btn btn-success btn-lg list-group-item">Спецификации</a>
-            <a href="{% url 'warehouses' %}" class="btn btn-warning btn-lg list-group-item">Склады</a>
+            <a href="{% url 'warehouses' %}" class="btn btn-info btn-lg list-group-item">Склады</a>
             <a href="{% url 'works' %}" class="btn btn-warning btn-lg list-group-item">Работы</a>
-            <a href="{% url 'contractors' %}" class="btn btn-warning btn-lg list-group-item">Контрагенты</a>
-            <a href="{% url 'logout' %}" class="btn btn-warning btn-lg list-group-item">Выйти</a>
+            <a href="{% url 'contractors' %}" class="btn btn-secondary btn-lg list-group-item">Контрагенты</a>
+            <a href="{% url 'movements' %}" class="btn btn-secondary btn-lg list-group-item">Движения</a>
+            <a href="{% url 'logout' %}" class="btn btn-danger btn-lg list-group-item">Выйти</a>
         </div>
     </div>
     {% endif %}

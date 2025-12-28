@@ -1,11 +1,14 @@
 from django.db import models
 
+from contractors.models import Contractor
+
 
 class Material(models.Model):
     article = models.IntegerField(verbose_name='артикул')
     name = models.CharField(max_length=50, verbose_name='наименование')
     unit = models.ForeignKey("Unit", on_delete=models.DO_NOTHING, verbose_name='единица измерения')
     price = models.FloatField(verbose_name='цена')
+    supplier = models.ForeignKey(Contractor, on_delete=models.PROTECT, verbose_name='поставщик')
 
     def __str__(self):
         return f'{self.article} {self.name}'
@@ -102,6 +105,54 @@ class Warehouse(models.Model):
         return len(self.materials)
 
 
+class Supply(models.Model):
+    code = models.IntegerField(verbose_name='код', unique=True)
+    supplier = models.ForeignKey(Contractor, on_delete=models.DO_NOTHING, verbose_name='поставщик')
+    warehouse = models.ForeignKey(Warehouse, on_delete=models.DO_NOTHING, verbose_name='склад')
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name='дата создания')
+
+    def __str__(self):
+        return f'{self.code}'
+
+    class Meta:
+        verbose_name = 'поставка'
+        verbose_name_plural = 'поставки'
+
+
+class Order(models.Model):
+    ORDER_STATUS = [
+        ('draft', 'Черновик'),
+        ('in_progress', 'В производстве'),
+        ('completed', 'Завершен'),
+        ('cancelled', 'Отменен'),
+    ]
+    code = models.IntegerField(verbose_name='код', unique=True)
+    contractor = models.ForeignKey(Contractor, on_delete=models.CASCADE, verbose_name='контрагент')
+    status = models.CharField(max_length=20, choices=ORDER_STATUS, default='draft')
+    created_at = models.DateTimeField(auto_now_add=True)
+    target_warehouse = models.ForeignKey(Warehouse, on_delete=models.DO_NOTHING, verbose_name='склад готовой продукции')
+
+    def __str__(self):
+        return f'{self.code}'
+
+    class Meta:
+        verbose_name = 'заказ'
+        verbose_name_plural = 'заказы'
+
+
+class Shipping(models.Model):
+    code = models.IntegerField(verbose_name='код', unique=True)
+    client = models.ForeignKey(Contractor, on_delete=models.DO_NOTHING, verbose_name='клиент')
+    warehouse = models.ForeignKey(Warehouse, on_delete=models.DO_NOTHING, verbose_name='склад')
+
+    def __str__(self):
+        return f'{self.code}'
+
+    class Meta:
+        verbose_name = 'отгрузка'
+        verbose_name_plural = 'отгрузка'
+
+
 class WarehouseMaterial(models.Model):
     warehouse = models.ForeignKey(Warehouse, on_delete=models.DO_NOTHING, verbose_name='склад')
     material = models.ForeignKey(Material, on_delete=models.DO_NOTHING, verbose_name='материал')
@@ -179,3 +230,29 @@ class MaterialUnit(models.Model):
     class Meta:
         verbose_name = 'связь материал-единица измерения'
         verbose_name_plural = 'связи материал-единица измерения'
+
+
+class SupplyMaterial(models.Model):
+    supply = models.ForeignKey(Supply, on_delete=models.DO_NOTHING, verbose_name='поставка')
+    material = models.ForeignKey(Material, on_delete=models.DO_NOTHING, verbose_name='материалы')
+    quantity = models.FloatField(verbose_name='количество')
+
+    def __str__(self):
+        return f'{self.supply.code} {self.material.article}'
+
+    class Meta:
+        verbose_name = 'связь поставка-материал'
+        verbose_name_plural = 'связи поставка-материал'
+
+
+class ShippingMaterial(models.Model):
+    shipping = models.ForeignKey(Shipping, on_delete=models.DO_NOTHING, verbose_name='отгрузка')
+    material = models.ForeignKey(Material, on_delete=models.DO_NOTHING, verbose_name='материалы')
+    quantity = models.FloatField(verbose_name='количество')
+
+    def __str__(self):
+        return f'{self.shipping.code} {self.material.article}'
+
+    class Meta:
+        verbose_name = 'связь отгрузка-материал'
+        verbose_name_plural = 'связи отгрузка-материал'

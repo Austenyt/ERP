@@ -6,6 +6,41 @@
     <h1 class="text-center mb-4">Номенклатура</h1>
     <a href="{% url 'index' %}" class="btn btn-secondary mb-3">← Назад на главную</a>
     <a href="{% url 'create_material' %}" class="btn btn-secondary mb-3">Создать материал</a>
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="get">
+                <div class="row g-3 align-items-center">
+                    <div class="col-auto">
+                        <label for="search" class="col-form-label">Поиск:</label>
+                    </div>
+                    <div class="col-md-6">
+                        <input type="text"
+                               id="search"
+                               name="search"
+                               class="form-control"
+                               placeholder="Введите артикул или название..."
+                               value="{{ search_query }}">
+                    </div>
+                    <div class="col-auto">
+                        <button type="submit" class="btn btn-outline-primary">Найти</button>
+                        {% if search_query %}
+                        <a href="{% url 'materials' %}" class="btn btn-outline-secondary">Сбросить</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Результаты поиска -->
+    {% if search_query %}
+    <div class="alert alert-info mb-3">
+        Результаты поиска для: "<strong>{{ search_query }}</strong>"
+        {% if not materials and not boms %}
+        - ничего не найдено
+        {% endif %}
+    </div>
+    {% endif %}
     <table class="table table-striped table-hover">
         <thead class="table-light">
         <tr>
@@ -15,7 +50,6 @@
         </tr>
         </thead>
         <tbody>
-        {% if materials %}
         {% for material in materials %}
         <tr>
             <td><a href="{% url 'detail_material' material.pk %}">{{ material.article }}</a></td>
@@ -23,8 +57,7 @@
             <td>{{ material.unit }}</td>
         </tr>
         {% endfor %}
-        {% endif %}
-        {% if boms %}
+
         {% for bom in boms %}
         <tr>
             <td><a href="{% url 'detail_bom' bom.id %}">{{ bom.article }}</a></td>
@@ -32,6 +65,16 @@
             <td>{{ bom.unit }}</td>
         </tr>
         {% endfor %}
+        {% if not materials and not boms %}
+        <tr>
+            <td colspan="3" class="text-center text-muted">
+                {% if search_query %}
+                Ничего не найдено
+                {% else %}
+                Номенклатура отсутствует
+                {% endif %}
+            </td>
+        </tr>
         {% endif %}
         </tbody>
     </table>
